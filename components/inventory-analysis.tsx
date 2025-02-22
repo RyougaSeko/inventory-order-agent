@@ -1,16 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import type React from "react"
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Upload, X, ImagePlus, Loader2 } from "lucide-react"
-import { AnalysisResults } from "./analysis-results"
-import { toast } from "sonner"
-import Image from "next/image"
-=======
 import type React from "react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +14,6 @@ import {
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
 import { AnalysisResults } from "./analysis-results";
 import { toast } from "sonner";
->>>>>>> alan
 
 interface ImageFile {
   file: File;
