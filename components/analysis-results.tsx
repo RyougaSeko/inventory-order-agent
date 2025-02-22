@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Loader2, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { getOrderPromptTemplate, getFirstMessage } from "@/config/order-call-config";
 
 interface Supplier {
   id: string;
@@ -58,29 +59,66 @@ export function AnalysisResults({
 
   const handleOrder = async (itemName: string) => {
     setLoading((prev) => ({ ...prev, [itemName]: true }));
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setLoading((prev) => ({ ...prev, [itemName]: false }));
-    setOrdered((prev) => ({ ...prev, [itemName]: true }));
+    
+    try {
+      // Find the item being ordered
+      const item = items.find((i) => i.name === itemName);
+      if (!item || !item.supplier) {
+        throw new Error("Item or supplier information not found");
+      }
 
-    // Show success toast
-    toast.success("Order Placed", {
-      description: `Successfully placed order for ${itemName}`,
-    });
+      const orderDetails = {
+        prompt: getOrderPromptTemplate(
+          item.name,
+          orderQuantities[item.name] || item.suggestedOrderQuantity || 0,
+          item.unit,
+          item.supplier.name
+        ),
+        first_message: getFirstMessage(),
+        number: process.env.OUTBOUND_PHONE,
+      };
 
-    // Check if all low stock items have been ordered
-    const allLowStockOrdered = items
-      .filter((item) => item.status === "Low")
-      .every((item) => ordered[item.name] || item.name === itemName);
+      // Make the API request to the outbound-call endpoint
+      const response = await fetch(process.env.OUTBOUND_CALL_ENDPOINT!, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderDetails),
+      });
 
-    if (allLowStockOrdered) {
-      // Close the dialog after a short delay to show the "Ordered" state
-      setTimeout(() => {
-        onOpenChange(false);
-        toast.success("All Orders Complete", {
-          description: "Successfully placed all pending orders",
-        });
-      }, 1000);
+      if (!response.ok) {
+        throw new Error("Failed to initiate call");
+      }
+
+      setLoading((prev) => ({ ...prev, [itemName]: false }));
+      setOrdered((prev) => ({ ...prev, [itemName]: true }));
+
+      // Show success toast
+      toast.success("Order Placed", {
+        description: `Successfully placed order for ${itemName}`,
+      });
+
+      // Check if all low stock items have been ordered
+      const allLowStockOrdered = items
+        .filter((item) => item.status === "Low")
+        .every((item) => ordered[item.name] || item.name === itemName);
+
+      if (allLowStockOrdered) {
+        // Close the dialog after a short delay to show the "Ordered" state
+        setTimeout(() => {
+          onOpenChange(false);
+          toast.success("All Orders Complete", {
+            description: "Successfully placed all pending orders",
+          });
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      setLoading((prev) => ({ ...prev, [itemName]: false }));
+      toast.error("Failed to place order", {
+        description: "Please try again later",
+      });
     }
   };
 
