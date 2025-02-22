@@ -1,5 +1,6 @@
-"use client"
+"use client";
 
+<<<<<<< HEAD
 import type React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,130 +10,140 @@ import { Upload, X, ImagePlus, Loader2 } from "lucide-react"
 import { AnalysisResults } from "./analysis-results"
 import { toast } from "sonner"
 import Image from "next/image"
+=======
+import type React from "react";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
+import { AnalysisResults } from "./analysis-results";
+import { toast } from "sonner";
+>>>>>>> alan
 
 interface ImageFile {
-  file: File
-  preview: string
-  id: string
+  file: File;
+  preview: string;
+  id: string;
 }
 
-interface Supplier {
-  id: string
-  name: string
-  price: number
-  deliveryDays: number
+export interface InventoryItem {
+  item_id: number;
+  name: string;
+  category: "Produce" | "Dairy" | "Grains";
+  quantity: number;
+  unit: "pieces" | "cartons" | "bags";
+  status?: "Sufficient" | "Low";
 }
 
-interface InventoryItem {
-  name: string
-  current: number
-  max: number
-  status: "Sufficient" | "Low"
-  supplier?: Supplier
-  suggestedOrderQuantity?: number
+const MAX_FILE_SIZE_MB = 5;
+
+interface InventoryAnalysisProps {
+  onAnalysisComplete: (items: InventoryItem[]) => void;
 }
 
-const MAX_IMAGES = 5
-const MAX_FILE_SIZE_MB = 5
-
-export function InventoryAnalysis() {
-  const [images, setImages] = useState<ImageFile[]>([])
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [resultsDialogOpen, setResultsDialogOpen] = useState(false)
-
-  const analysisResults: InventoryItem[] = [
-    {
-      name: "Chicken Breast",
-      current: 50,
-      max: 100,
-      status: "Sufficient",
-    },
-    {
-      name: "Tomatoes",
-      current: 30,
-      max: 50,
-      status: "Sufficient",
-    },
-    {
-      name: "Spaghetti Pasta",
-      current: 100,
-      max: 150,
-      status: "Sufficient",
-    },
-    {
-      name: "Olive Oil",
-      current: 10,
-      max: 30,
-      status: "Low",
-      supplier: {
-        id: "s1",
-        name: "Mediterranean Foods Inc.",
-        price: 15.0,
-        deliveryDays: 3,
-      },
-      suggestedOrderQuantity: 20,
-    },
-  ]
+export function InventoryAnalysis({
+  onAnalysisComplete,
+}: InventoryAnalysisProps) {
+  const [image, setImage] = useState<ImageFile | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [resultsDialogOpen, setResultsDialogOpen] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<InventoryItem[]>([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const newFiles = Array.from(event.target.files)
-      
-      if (images.length + newFiles.length > MAX_IMAGES) {
-        toast.error(`Maximum ${MAX_IMAGES} images allowed`)
-        return
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(`File ${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit`);
+        return;
       }
 
-      newFiles.forEach(file => {
-        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-          toast.error(`File ${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit`)
-          return
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const target = e.target;
+        if (target && target.result) {
+          setImage({
+            file,
+            preview: target.result as string,
+            id: crypto.randomUUID(),
+          });
         }
-
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          const target = e.target
-          if (target && target.result) {
-            setImages(prev => [...prev, {
-              file,
-              preview: target.result as string,
-              id: crypto.randomUUID()
-            }])
-          }
-        }
-        reader.readAsDataURL(file)
-      })
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
-  const handleRemoveImage = (id: string) => {
-    setImages(prev => prev.filter(img => img.id !== id))
-  }
+  const handleRemoveImage = () => {
+    setImage(null);
+  };
 
   const handleUpload = async () => {
-    if (images.length === 0) {
-      toast.error("Please select at least one image")
-      return
+    if (!image) {
+      toast.error("Please select an image");
+      return;
     }
-    
-    setAnalyzing(true)
+
+    setAnalyzing(true);
     try {
-      // Simulate API call for multiple image analysis
-      await Promise.all(images.map(() => 
-        new Promise(resolve => setTimeout(resolve, 1000))
-      ))
-      
-      setDialogOpen(false)
-      setResultsDialogOpen(true)
-      toast.success("Analysis complete")
-    } catch (err) {
-      console.error("Analysis failed:", err)
-      toast.error("Failed to analyze images")
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: image.preview,
+          filename: image.file.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Analysis failed");
+      }
+
+      const analysisData = await response.json();
+
+      // Transform the data to include status based on minimum requirements
+      const transformedItems = analysisData.map((item: InventoryItem) => {
+        let status: "Sufficient" | "Low";
+        switch (item.name.toLowerCase()) {
+          case "tomatoes":
+            status = item.quantity >= 3 ? "Sufficient" : "Low";
+            break;
+          case "cartons of milk":
+            status = item.quantity >= 2 ? "Sufficient" : "Low";
+            break;
+          case "cartons of eggs":
+            status = item.quantity >= 4 ? "Sufficient" : "Low";
+            break;
+          case "bags of rice":
+            status = item.quantity >= 3 ? "Sufficient" : "Low";
+            break;
+          default:
+            status = "Sufficient";
+        }
+        return { ...item, status };
+      });
+
+      setAnalysisResults(transformedItems);
+      onAnalysisComplete(transformedItems);
+      setDialogOpen(false);
+      setResultsDialogOpen(true);
+      toast.success("Analysis complete");
+    } catch (error) {
+      toast.error("Failed to analyze image");
+      console.error(error);
     } finally {
-      setAnalyzing(false)
+      setAnalyzing(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -143,19 +154,19 @@ export function InventoryAnalysis() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              Upload Inventory Images
+              Upload Inventory Image
               <Upload className="ml-2 h-4 w-4" />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>Upload Inventory Images</DialogTitle>
+              <DialogTitle>Upload Inventory Image</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="flex flex-wrap gap-4">
-                {images.map((image) => (
-                  <div key={image.id} className="relative w-32 h-32">
-                    <Image
+                {image ? (
+                  <div className="relative w-32 h-32">
+                    <img
                       src={image.preview}
                       alt="Preview"
                       className="object-cover rounded-lg"
@@ -166,13 +177,12 @@ export function InventoryAnalysis() {
                       variant="destructive"
                       size="icon"
                       className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                      onClick={() => handleRemoveImage(image.id)}
+                      onClick={handleRemoveImage}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
-                ))}
-                {images.length < MAX_IMAGES && (
+                ) : (
                   <label
                     htmlFor="dropzone-file"
                     className="flex flex-col items-center justify-center w-32 h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
@@ -180,9 +190,7 @@ export function InventoryAnalysis() {
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <ImagePlus className="w-8 h-8 mb-2 text-gray-500" />
                       <p className="text-xs text-gray-500 text-center">
-                        Click to add
-                        <br />
-                        {`(${images.length}/${MAX_IMAGES})`}
+                        Click to add image
                       </p>
                     </div>
                     <input
@@ -191,20 +199,19 @@ export function InventoryAnalysis() {
                       className="hidden"
                       onChange={handleFileChange}
                       accept="image/*"
-                      multiple
                     />
                   </label>
                 )}
               </div>
               <Button
                 onClick={handleUpload}
-                disabled={analyzing || images.length === 0}
+                disabled={analyzing || !image}
                 className="w-full"
               >
                 {analyzing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing Images...
+                    Analyzing Image...
                   </>
                 ) : (
                   "Analyze Inventory"
@@ -214,13 +221,15 @@ export function InventoryAnalysis() {
           </DialogContent>
         </Dialog>
 
-        {images.length > 0 && !dialogOpen && (
+        {image && !dialogOpen && (
           <div className="mt-4">
-            <p className="text-sm text-gray-500">
-              {images.length} {images.length === 1 ? "image" : "images"} selected
-            </p>
-            <Button variant="outline" className="mt-2" onClick={() => setDialogOpen(true)}>
-              View Images
+            <p className="text-sm text-gray-500">1 image selected</p>
+            <Button
+              variant="outline"
+              className="mt-2"
+              onClick={() => setDialogOpen(true)}
+            >
+              View Image
             </Button>
           </div>
         )}
@@ -232,6 +241,5 @@ export function InventoryAnalysis() {
         />
       </CardContent>
     </Card>
-  )
+  );
 }
-
