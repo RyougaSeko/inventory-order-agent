@@ -43,17 +43,17 @@ export async function POST(request: Request) {
       },
     });
 
-    const prompt = `Analyze this image of a pantry and count the following items:
+    const prompt = `Analyze this image of a pantry and count the following items (use this titles for the item names):
     - Tomatoes
     - Cartons of milk
     - Cartons of eggs
     - Bags of rice
     
     Compare against these minimum requirements:
-    - 3 tomatoes
-    - 2 cartons of milk
-    - 4 cartons of egg
-    - 3 bags of rice`;
+    - 3 Tomatoes
+    - 2 Cartons of milk
+    - 4 Cartons of eggs
+    - 3 Bags of rice`;
 
     // Create image part from base64 data
     const imagePart = {
@@ -71,8 +71,8 @@ export async function POST(request: Request) {
     // Try to parse the response text directly, if it fails, handle the error gracefully
     try {
       return NextResponse.json(JSON.parse(text));
-    } catch (jsonError) {
-      console.error("Failed to parse JSON response:", text);
+    } catch (error) {
+      console.error("Failed to parse JSON response:", text, error);
       return NextResponse.json(
         { error: "Invalid response format from AI model" },
         { status: 500 }

@@ -14,6 +14,7 @@ import {
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
 import { AnalysisResults } from "./analysis-results";
 import { toast } from "sonner";
+import { InventoryItemName, reorderPoints } from "@/app/page";
 
 interface ImageFile {
   file: File;
@@ -23,11 +24,12 @@ interface ImageFile {
 
 export interface InventoryItem {
   item_id: number;
-  name: string;
+  name: InventoryItemName;
   category: "Produce" | "Dairy" | "Grains";
   quantity: number;
   unit: "pieces" | "cartons" | "bags";
-  status?: "Sufficient" | "Low";
+  status: "Sufficient" | "Low";
+  maxQuantity: number;
 }
 
 const MAX_FILE_SIZE_MB = 5;
@@ -99,26 +101,10 @@ export function InventoryAnalysis({
       const analysisData = await response.json();
 
       // Transform the data to include status based on minimum requirements
-      const transformedItems = analysisData.map((item: InventoryItem) => {
-        let status: "Sufficient" | "Low";
-        switch (item.name.toLowerCase()) {
-          case "tomatoes":
-            status = item.quantity >= 3 ? "Sufficient" : "Low";
-            break;
-          case "cartons of milk":
-            status = item.quantity >= 2 ? "Sufficient" : "Low";
-            break;
-          case "cartons of eggs":
-            status = item.quantity >= 4 ? "Sufficient" : "Low";
-            break;
-          case "bags of rice":
-            status = item.quantity >= 3 ? "Sufficient" : "Low";
-            break;
-          default:
-            status = "Sufficient";
-        }
-        return { ...item, status };
-      });
+      const transformedItems = analysisData.map((item: InventoryItem) => ({
+        ...item,
+        status: item.quantity > reorderPoints[item.name] ? "Sufficient" : "Low",
+      }));
 
       setAnalysisResults(transformedItems);
       onAnalysisComplete(transformedItems);
@@ -158,7 +144,6 @@ export function InventoryAnalysis({
                       src={image.preview}
                       alt="Preview"
                       className="object-cover rounded-lg"
-                      fill
                       sizes="128px"
                     />
                     <Button

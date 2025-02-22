@@ -1,46 +1,15 @@
+import { InventoryItemName, maxQuantities, reorderPoints } from "@/app/page";
+import { InventoryItem } from "./inventory-analysis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-interface InventoryItem {
-  name: string;
-  quantity: number;
-  maxQuantity: number;
-  status: "Sufficient" | "Low";
-}
-
 export function InventoryOverview({ items }: { items?: InventoryItem[] }) {
-  const defaultItems: InventoryItem[] = [
-    {
-      name: "Tomatoes",
-      quantity: 15,
-      maxQuantity: 30,
-      status: "Sufficient",
-    },
-    {
-      name: "Cartons of milk",
-      quantity: 7,
-      maxQuantity: 8,
-      status: "Sufficient",
-    },
-    {
-      name: "Cartons of eggs",
-      quantity: 12,
-      maxQuantity: 24,
-      status: "Sufficient",
-    },
-    {
-      name: "Bags of rice",
-      quantity: 6,
-      maxQuantity: 10,
-      status: "Sufficient",
-    },
-  ];
-  const inventoryItems = items?.length ? items : defaultItems;
-
-  // Create a map of default max quantities
-  const defaultMaxQuantities = Object.fromEntries(
-    defaultItems.map((item) => [item.name, item.maxQuantity])
-  );
+  const getStatus = (
+    name: InventoryItemName,
+    quantity: number
+  ): "Sufficient" | "Low" => {
+    return quantity <= reorderPoints[name] ? "Low" : "Sufficient";
+  };
 
   return (
     <Card>
@@ -48,28 +17,25 @@ export function InventoryOverview({ items }: { items?: InventoryItem[] }) {
         <CardTitle>Inventory Overview</CardTitle>
       </CardHeader>
       <CardContent>
-        {inventoryItems.map((item) => (
+        {items?.map((item) => (
           <div key={item.name} className="mb-4">
             <div className="flex justify-between mb-1">
               <span>{item.name}</span>
               <span
                 className={
-                  item.status === "Low" ? "text-red-500" : "text-green-500"
+                  getStatus(item.name, item.quantity) === "Low"
+                    ? "text-red-500"
+                    : "text-green-500"
                 }
               >
-                {item.status}
+                {getStatus(item.name, item.quantity)}
               </span>
             </div>
             <Progress
-              value={
-                (item.quantity /
-                  (defaultMaxQuantities[item.name] || item.maxQuantity)) *
-                100
-              }
+              value={(item.quantity / maxQuantities[item.name]) * 100}
             />
             <div className="text-sm text-gray-500 mt-1">
-              {item.quantity}/
-              {defaultMaxQuantities[item.name] || item.maxQuantity}
+              {item.quantity}/{maxQuantities[item.name]}
             </div>
           </div>
         ))}

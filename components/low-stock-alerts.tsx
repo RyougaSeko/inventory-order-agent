@@ -1,12 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { InventoryItem } from "./inventory-analysis";
+import { reorderPoints } from "@/app/page";
 
-export function LowStockAlerts() {
-  const lowStockItems = [
-    { name: "Eggs", quantity: 2, unit: "cases", reorderPoint: 5 },
-    { name: "Milk", quantity: 5, unit: "gallons", reorderPoint: 10 },
-    { name: "Olive Oil", quantity: 10, unit: "gallons", reorderPoint: 15 },
-  ]
+export function LowStockAlerts({ items }: { items: InventoryItem[] }) {
+  const lowStockItems = items
+    .filter((item) => {
+      const reorderPoint = reorderPoints[item.name];
+      return item.quantity <= reorderPoint;
+    })
+    .map((item) => ({
+      ...item,
+      reorderPoint: reorderPoints[item.name],
+    }));
 
   return (
     <Card>
@@ -14,21 +20,27 @@ export function LowStockAlerts() {
         <CardTitle>Low Stock Alerts</CardTitle>
       </CardHeader>
       <CardContent>
-        {lowStockItems.map((item) => (
-          <div key={item.name} className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <AlertCircle className="text-red-500 mr-2" />
-              <span>
-                {item.name}: {item.quantity} {item.unit} remaining
+        {lowStockItems.length > 0 ? (
+          lowStockItems.map((item) => (
+            <div
+              key={item.name}
+              className="flex items-center justify-between mb-4"
+            >
+              <div className="flex items-center">
+                <AlertCircle className="text-red-500 mr-2" />
+                <span>
+                  {item.name}: {item.quantity} {item.unit} remaining
+                </span>
+              </div>
+              <span className="text-sm text-gray-500">
+                Reorder at: {item.reorderPoint} {item.unit}
               </span>
             </div>
-            <span className="text-sm text-gray-500">
-              Reorder at: {item.reorderPoint} {item.unit}
-            </span>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-green-600">All stock levels are sufficient</div>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }
-
