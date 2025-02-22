@@ -1,6 +1,6 @@
 "use client";
 
-import { reorderPoints } from "@/app/page";
+import { reorderPoints } from "@/types/inventory";
 import { InventoryItem } from "@/components/inventory-analysis";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

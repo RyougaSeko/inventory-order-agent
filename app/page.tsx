@@ -49,20 +49,6 @@ const defaultInventoryItems: InventoryItem[] = [
   },
 ];
 
-export const maxQuantities: Record<InventoryItemName, number> = {
-  [InventoryItemName.CARTONS_OF_MILK]: 8,
-  [InventoryItemName.CARTONS_OF_EGGS]: 24,
-  [InventoryItemName.BAGS_OF_RICE]: 10,
-  [InventoryItemName.TOMATOES]: 30,
-};
-
-export const reorderPoints: Record<InventoryItemName, number> = {
-  [InventoryItemName.CARTONS_OF_MILK]: 3,
-  [InventoryItemName.CARTONS_OF_EGGS]: 4,
-  [InventoryItemName.BAGS_OF_RICE]: 5,
-  [InventoryItemName.TOMATOES]: 4,
-};
-
 export default function Dashboard() {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(
     defaultInventoryItems

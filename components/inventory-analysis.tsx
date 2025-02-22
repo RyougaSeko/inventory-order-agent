@@ -14,7 +14,7 @@ import {
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
 import { AnalysisResults } from "./analysis-results";
 import { toast } from "sonner";
-import { InventoryItemName, reorderPoints } from "@/app/page";
+import { InventoryItemName, reorderPoints } from "@/types/inventory";
 
 interface ImageFile {
   file: File;
