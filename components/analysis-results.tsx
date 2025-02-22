@@ -75,11 +75,11 @@ export function AnalysisResults({
           item.supplier.name
         ),
         first_message: getFirstMessage(),
-        number: process.env.OUTBOUND_PHONE,
+        number: process.env.NEXT_PUBLIC_OUTBOUND_PHONE,
       };
 
       // Make the API request to the outbound-call endpoint
-      const response = await fetch(process.env.OUTBOUND_CALL_ENDPOINT!, {
+      const response = await fetch(process.env.NEXT_PUBLIC_OUTBOUND_CALL_ENDPOINT!, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
