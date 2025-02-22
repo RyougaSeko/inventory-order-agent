@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Check, Loader2, ShoppingCart } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 
 interface Supplier {
   id: string
@@ -49,6 +50,11 @@ export function AnalysisResults({ open, onOpenChange, items }: AnalysisResultsPr
     setLoading((prev) => ({ ...prev, [itemName]: false }))
     setOrdered((prev) => ({ ...prev, [itemName]: true }))
 
+    // Show success toast
+    toast.success("Order Placed", {
+      description: `Successfully placed order for ${itemName}`,
+    })
+
     // Check if all low stock items have been ordered
     const allLowStockOrdered = items
       .filter((item) => item.status === "Low")
@@ -56,7 +62,12 @@ export function AnalysisResults({ open, onOpenChange, items }: AnalysisResultsPr
 
     if (allLowStockOrdered) {
       // Close the dialog after a short delay to show the "Ordered" state
-      setTimeout(() => onOpenChange(false), 1000)
+      setTimeout(() => {
+        onOpenChange(false)
+        toast.success("All Orders Complete", {
+          description: "Successfully placed all pending orders",
+        })
+      }, 1000)
     }
   }
 
@@ -117,7 +128,7 @@ export function AnalysisResults({ open, onOpenChange, items }: AnalysisResultsPr
                     <Button
                       onClick={() => handleOrder(item.name)}
                       disabled={loading[item.name] || ordered[item.name]}
-                      className="w-full md:w-auto min-h-[3rem] text-base md:text-lg px-6"
+                      className="w-full md:w-auto min-h-[3rem] text-base md:text-lg px-6 bg-green-600 hover:bg-green-700 text-white transition-colors disabled:bg-green-200"
                     >
                       {loading[item.name] ? (
                         <>
@@ -144,7 +155,8 @@ export function AnalysisResults({ open, onOpenChange, items }: AnalysisResultsPr
         </div>
         <Button 
           onClick={() => onOpenChange(false)}
-          className="w-full md:w-auto min-h-[3rem] text-base md:text-lg mt-4"
+          variant="outline"
+          className="w-full md:w-auto min-h-[3rem] text-base md:text-lg mt-4 border-2 hover:bg-gray-100 transition-colors"
         >
           Close
         </Button>
