@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-import { InventoryItem } from "./inventory-analysis";
-import { reorderPoints } from "@/types/inventory";
+import { reorderPoints, InventoryItem } from "@/types/inventory";
 
 export function LowStockAlerts({ items }: { items: InventoryItem[] }) {
   const lowStockItems = items

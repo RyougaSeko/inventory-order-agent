@@ -12,23 +12,13 @@ import { Check, Loader2, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { getOrderPromptTemplate, getFirstMessage } from "@/config/order-call-config";
+import { InventoryItem } from "@/types/inventory";
 
 interface Supplier {
   id: string;
   name: string;
   price: number;
   deliveryDays: number;
-}
-
-interface InventoryItem {
-  name: string;
-  current: number;
-  max: number;
-  status: "Sufficient" | "Low";
-  supplier?: Supplier;
-  suggestedOrderQuantity?: number;
-  quantity: number;
-  unit: string;
 }
 
 interface AnalysisResultsProps {

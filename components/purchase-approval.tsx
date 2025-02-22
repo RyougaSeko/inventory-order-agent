@@ -1,7 +1,6 @@
 "use client";
 
-import { reorderPoints } from "@/types/inventory";
-import { InventoryItem } from "@/components/inventory-analysis";
+import { reorderPoints, InventoryItem } from "@/types/inventory";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Loader2 } from "lucide-react";

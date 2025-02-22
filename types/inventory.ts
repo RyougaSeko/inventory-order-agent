@@ -5,6 +5,27 @@ export enum InventoryItemName {
   BAGS_OF_RICE = "Bags of rice",
 }
 
+export interface Supplier {
+  id: string;
+  name: string;
+  price: number;
+  deliveryDays: number;
+}
+
+export interface InventoryItem {
+  item_id: number;
+  name: InventoryItemName;
+  category: "Produce" | "Dairy" | "Grains";
+  quantity: number;
+  unit: "pieces" | "cartons" | "bags";
+  status: "Sufficient" | "Low";
+  maxQuantity: number;
+  current: number;
+  max: number;
+  supplier?: Supplier;
+  suggestedOrderQuantity?: number;
+}
+
 export const maxQuantities: Record<InventoryItemName, number> = {
   [InventoryItemName.CARTONS_OF_MILK]: 8,
   [InventoryItemName.CARTONS_OF_EGGS]: 24,

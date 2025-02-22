@@ -14,22 +14,12 @@ import {
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
 import { AnalysisResults } from "./analysis-results";
 import { toast } from "sonner";
-import { InventoryItemName, reorderPoints } from "@/types/inventory";
+import { InventoryItemName, reorderPoints, InventoryItem } from "@/types/inventory";
 
 interface ImageFile {
   file: File;
   preview: string;
   id: string;
-}
-
-export interface InventoryItem {
-  item_id: number;
-  name: InventoryItemName;
-  category: "Produce" | "Dairy" | "Grains";
-  quantity: number;
-  unit: "pieces" | "cartons" | "bags";
-  status: "Sufficient" | "Low";
-  maxQuantity: number;
 }
 
 const MAX_FILE_SIZE_MB = 5;

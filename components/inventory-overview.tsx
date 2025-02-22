@@ -1,5 +1,4 @@
-import { InventoryItemName, maxQuantities, reorderPoints } from "@/types/inventory";
-import { InventoryItem } from "./inventory-analysis";
+import { InventoryItemName, maxQuantities, reorderPoints, InventoryItem } from "@/types/inventory";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
