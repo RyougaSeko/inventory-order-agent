@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react"
 import { AnalysisResults } from "./analysis-results"
 import { toast } from "sonner"
+import Image from "next/image"
 
 interface ImageFile {
   file: File
@@ -118,14 +119,15 @@ export function InventoryAnalysis() {
     setAnalyzing(true)
     try {
       // Simulate API call for multiple image analysis
-      await Promise.all(images.map(image => 
+      await Promise.all(images.map(() => 
         new Promise(resolve => setTimeout(resolve, 1000))
       ))
       
       setDialogOpen(false)
       setResultsDialogOpen(true)
       toast.success("Analysis complete")
-    } catch (error) {
+    } catch (err) {
+      console.error("Analysis failed:", err)
       toast.error("Failed to analyze images")
     } finally {
       setAnalyzing(false)
@@ -153,10 +155,12 @@ export function InventoryAnalysis() {
               <div className="flex flex-wrap gap-4">
                 {images.map((image) => (
                   <div key={image.id} className="relative w-32 h-32">
-                    <img
+                    <Image
                       src={image.preview}
                       alt="Preview"
-                      className="w-full h-full object-cover rounded-lg"
+                      className="object-cover rounded-lg"
+                      fill
+                      sizes="128px"
                     />
                     <Button
                       variant="destructive"
