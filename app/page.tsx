@@ -8,13 +8,7 @@ import { InventoryOverview } from "@/components/inventory-overview";
 import { LowStockAlerts } from "@/components/low-stock-alerts";
 import { PurchaseApproval } from "@/components/purchase-approval";
 import { RecentActivity } from "@/components/recent-activity";
-
-export enum InventoryItemName {
-  TOMATOES = "Tomatoes",
-  CARTONS_OF_MILK = "Cartons of milk",
-  CARTONS_OF_EGGS = "Cartons of eggs",
-  BAGS_OF_RICE = "Bags of rice",
-}
+import { InventoryItemName } from "@/types/inventory";
 
 const defaultInventoryItems: InventoryItem[] = [
   {
