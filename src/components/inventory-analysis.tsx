@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -30,11 +31,6 @@ export function InventoryAnalysis() {
   const [analyzing, setAnalyzing] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [resultsDialogOpen, setResultsDialogOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const analysisResults: InventoryItem[] = [
     {
@@ -95,19 +91,6 @@ export function InventoryAnalysis() {
   const handleRemoveFile = () => {
     setFile(null)
     setPreview(null)
-  }
-
-  if (!mounted) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Inventory Analysis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div>Loading...</div>
-        </CardContent>
-      </Card>
-    )
   }
 
   return (
