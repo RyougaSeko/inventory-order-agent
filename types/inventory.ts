@@ -20,8 +20,8 @@ export interface InventoryItem {
   unit: "pieces" | "cartons" | "bags";
   status: "Sufficient" | "Low";
   maxQuantity: number;
-  current: number;
-  max: number;
+  current?: number;
+  max?: number;
   supplier?: Supplier;
   suggestedOrderQuantity?: number;
 }

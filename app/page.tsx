@@ -1,14 +1,11 @@
 "use client";
 import { useState } from "react";
-import {
-  InventoryAnalysis,
-  InventoryItem,
-} from "@/components/inventory-analysis";
+import { InventoryAnalysis } from "@/components/inventory-analysis";
 import { InventoryOverview } from "@/components/inventory-overview";
 import { LowStockAlerts } from "@/components/low-stock-alerts";
 import { PurchaseApproval } from "@/components/purchase-approval";
 import { RecentActivity } from "@/components/recent-activity";
-import { InventoryItemName } from "@/types/inventory";
+import { InventoryItem, InventoryItemName } from "@/types/inventory";
 
 const defaultInventoryItems: InventoryItem[] = [
   {

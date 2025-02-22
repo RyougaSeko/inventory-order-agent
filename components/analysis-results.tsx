@@ -131,7 +131,7 @@ export function AnalysisResults({
               <div className="h-3 md:h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-black transition-all duration-300"
-                  style={{ width: `${(item.current / item.max) * 100}%` }}
+                  style={{ width: `${((item.current ?? item.quantity) / (item.max ?? item.maxQuantity)) * 100}%` }}
                 />
               </div>
               <div className="text-sm md:text-base text-gray-600">
