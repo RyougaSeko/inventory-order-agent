@@ -1,6 +1,6 @@
 "use client";
 
-import { reorderPoints, InventoryItem } from "@/types/inventory";
+import { reorderPoints, InventoryItem, Supplier } from "@/types/inventory";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -10,9 +10,7 @@ import { toast } from "sonner";
 
 // Extend the InventoryItem interface to include supplier
 interface ExtendedInventoryItem extends InventoryItem {
-  supplier?: {
-    name: string
-  };
+  supplier?: Supplier;
 }
 
 interface PurchaseApprovalProps {
@@ -52,7 +50,7 @@ export function PurchaseApproval({
           reorderPoint: reorderPoints[item.name],
         }))
     );
-  }, [items, reorderPoints]);
+  }, [items]);
 
   const handleApprove = async (id: number) => {
     setLoading((prev) => ({ ...prev, [id]: true }));

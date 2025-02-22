@@ -14,7 +14,8 @@ import {
 import { Upload, X, ImagePlus, Loader2 } from "lucide-react";
 import { AnalysisResults } from "./analysis-results";
 import { toast } from "sonner";
-import { InventoryItemName, reorderPoints, InventoryItem } from "@/types/inventory";
+import { reorderPoints, InventoryItem } from "@/types/inventory";
+import Image from "next/image";
 
 interface ImageFile {
   file: File;
@@ -130,10 +131,11 @@ export function InventoryAnalysis({
               <div className="flex flex-wrap gap-4">
                 {image ? (
                   <div className="relative w-32 h-32">
-                    <img
+                    <Image
                       src={image.preview}
                       alt="Preview"
                       className="object-cover rounded-lg"
+                      fill
                       sizes="128px"
                     />
                     <Button

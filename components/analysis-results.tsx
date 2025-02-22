@@ -14,13 +14,6 @@ import { toast } from "sonner";
 import { getOrderPromptTemplate, getFirstMessage } from "@/config/order-call-config";
 import { InventoryItem } from "@/types/inventory";
 
-interface Supplier {
-  id: string;
-  name: string;
-  price: number;
-  deliveryDays: number;
-}
-
 interface AnalysisResultsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
