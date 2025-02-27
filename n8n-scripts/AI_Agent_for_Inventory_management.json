@@ -1,0 +1,397 @@
+{
+  "name": "AI Agent for Inventory management",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        860
+      ],
+      "id": "dc391ba8-3781-4a9f-9817-97d890da6282",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1dqdLZa7GhUwfxfg",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve the latest image of the pantry",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appa3qXkhAxKFyBZr",
+          "mode": "list",
+          "cachedResultName": "Inventory Photo Management",
+          "cachedResultUrl": "https://airtable.com/appa3qXkhAxKFyBZr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblpu0KxogiTQEcOB",
+          "mode": "list",
+          "cachedResultName": "Photos",
+          "cachedResultUrl": "https://airtable.com/appa3qXkhAxKFyBZr/tblpu0KxogiTQEcOB"
+        },
+        "options": {
+          "fields": [
+            "Name",
+            "Photo"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        1660,
+        820
+      ],
+      "id": "002a51c6-84df-4d18-b061-692cb1074892",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "fYMh5ZHug2AV4VG8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        760
+      ],
+      "id": "b1e5804d-b730-4ef1-9274-1c4f6493a555",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "zvf5VszPuPpUerb6",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1160,
+        580
+      ],
+      "id": "bad1f748-21fd-4469-9528-2b24402864f1",
+      "name": "When chat message received",
+      "webhookId": "fafa259b-1c50-4a16-bac9-0b78c75c465b"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": " {{ $json.body.sessionId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2300,
+        860
+      ],
+      "id": "ac8776e4-03e3-4a3d-b062-8a835a8779e6",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1540,
+        780
+      ],
+      "id": "b3987ce4-0f3c-47ef-8482-e32ce9a06a1f",
+      "name": "Window Buffer Memory1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "= {{ $json.body.sessionId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2800,
+        860
+      ],
+      "id": "546e2eaa-b2b1-4857-a3e1-016cfb8b82e3",
+      "name": "Window Buffer Memory2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        840
+      ],
+      "id": "f35f5dca-ebb5-4a6f-9a37-f1524078467b",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "zvf5VszPuPpUerb6",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are to contact the supplier through slack and request for the inventory to be ordered."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2700,
+        620
+      ],
+      "id": "42ef85c9-078b-4e4f-ab59-9e75f6bc5416",
+      "name": "Contact Supplier"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "user": {
+          "__rl": true,
+          "value": "U08BENNQZ9S",
+          "mode": "list",
+          "cachedResultName": "alan.truong2"
+        },
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        3180,
+        620
+      ],
+      "id": "8c6cd5a3-bd3c-44bd-a6b7-99cd1aa1ffd2",
+      "name": "Slack",
+      "webhookId": "849d0786-4f65-43ed-8e16-425e74fa9817",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "OuBqAh9lJRIbR2Dk",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=This is the image {{ $json.body.image }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are to determine the stock levels of the pantry given the image. \n\nMake sure there are at least \n\n- 3 tomatoes\n- 2 cartons of milk\n- 4 cartons of egg\n- 3 bags of rice\n\nDecide on two scenarios. \n\nIf there is sufficient stock, return to the user the list of all items and their stock. \n\nIf there isn’t sufficient stock, determine the items that are under stocked and send this to the supplier.\n\nExample (quantity and cost might change):\n[\n  {\n    \"item_id\": 1,\n    \"name\": \"Tomatoes\",\n    \"category\": \"Produce\",\n    \"quantity\": 5,\n    \"unit\": \"pieces\",\n    \"supplier\": \"Fresh Farms\",\n    \"cost_per_unit\": 0.75,\n    \"expiration_date\": \"2025-02-28\",\n    \"storage_location\": \"Pantry Shelf A\"\n  },\n  {\n    \"item_id\": 2,\n    \"name\": \"Milk\",\n    \"category\": \"Dairy\",\n    \"quantity\": 3,\n    \"unit\": \"cartons\",\n    \"supplier\": \"Dairy Fresh Ltd.\",\n    \"cost_per_unit\": 4.50,\n    \"expiration_date\": \"2025-02-25\",\n    \"storage_location\": \"Refrigerator A\"\n  },\n  {\n    \"item_id\": 3,\n    \"name\": \"Eggs\",\n    \"category\": \"Dairy\",\n    \"quantity\": 5,\n    \"unit\": \"cartons\",\n    \"supplier\": \"Local Farm Co.\",\n    \"cost_per_unit\": 3.99,\n    \"expiration_date\": \"2025-02-27\",\n    \"storage_location\": \"Refrigerator B\"\n  },\n  {\n    \"item_id\": 4,\n    \"name\": \"Rice\",\n    \"category\": \"Grains\",\n    \"quantity\": 4,\n    \"unit\": \"bags\",\n    \"supplier\": \"Global Grains Co.\",\n    \"cost_per_unit\": 12.00,\n    \"expiration_date\": \"2027-10-15\",\n    \"storage_location\": \"Pantry Shelf C\"\n  }\n]\n\nGive the output of the items in this structure\nYou are to determine the stock levels of the pantry given the image. \n\nMake sure there are at least \n\n- 3 tomatoes\n- 2 cartons of milk\n- 4 cartons of egg\n- 3 bags of rice\n\nDecide on two scenarios. \n\nIf there is sufficient stock, return to the user the list of all items and their stock. \n\nIf there isn’t sufficient stock, determine the items that are under stocked and send this to the supplier.\n\nExample (quantity and cost might change):\n  {\n    \"item_id\": 1,\n    \"name\": \"Tomatoes\",\n    \"category\": \"Produce\",\n    \"quantity\": 5,\n    \"unit\": \"pieces\",\n    \"supplier\": \"Fresh Farms\",\n    \"cost_per_unit\": 0.75,\n    \"expiration_date\": \"2025-02-28\",\n    \"storage_location\": \"Pantry Shelf A\"\n  },\n  {\n    \"item_id\": 2,\n    \"name\": \"Milk\",\n    \"category\": \"Dairy\",\n    \"quantity\": 3,\n    \"unit\": \"cartons\",\n    \"supplier\": \"Dairy Fresh Ltd.\",\n    \"cost_per_unit\": 4.50,\n    \"expiration_date\": \"2025-02-25\",\n    \"storage_location\": \"Refrigerator A\"\n  },\n  {\n    \"item_id\": 3,\n    \"name\": \"Eggs\",\n    \"category\": \"Dairy\",\n    \"quantity\": 5,\n    \"unit\": \"cartons\",\n    \"supplier\": \"Local Farm Co.\",\n    \"cost_per_unit\": 3.99,\n    \"expiration_date\": \"2025-02-27\",\n    \"storage_location\": \"Refrigerator B\"\n  },\n  {\n    \"item_id\": 4,\n    \"name\": \"Rice\",\n    \"category\": \"Grains\",\n    \"quantity\": 4,\n    \"unit\": \"bags\",\n    \"supplier\": \"Global Grains Co.\",\n    \"cost_per_unit\": 12.00,\n    \"expiration_date\": \"2027-10-15\",\n    \"storage_location\": \"Pantry Shelf C\"\n  }\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2200,
+        620
+      ],
+      "id": "a961c41f-f346-468b-8fee-d89b354ffa88",
+      "name": "Image analyser"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI Agent that retrieves the latest image from the pantry."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1440,
+        560
+      ],
+      "id": "7cf5930f-a3f5-4472-862b-6d789d3d2adf",
+      "name": "Pantry Checker"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "367f0f3a-31a7-4cee-8b0b-e1dc11c44be6",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        620
+      ],
+      "id": "7cf2ce94-36cd-4a45-be36-fe157039c1d0",
+      "name": "Webhook",
+      "webhookId": "367f0f3a-31a7-4cee-8b0b-e1dc11c44be6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image analyser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pantry Checker",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Pantry Checker",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Pantry Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Image analyser",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Pantry Checker",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Contact Supplier",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Contact Supplier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Supplier": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image analyser": {
+      "main": [
+        [
+          {
+            "node": "Contact Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pantry Checker": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Image analyser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "dc2b900d-aef9-402f-81e0-8ab5d08cc642",
+  "meta": {
+    "templateId": "2330",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79c7935fcccb0adbeb029af6fcbc7d8ba83aa9fc34dd42ad78a12d6bcbabf63f"
+  },
+  "id": "ibi46k5BVF8dpqVD",
+  "tags": []
+}
